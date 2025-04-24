@@ -64,7 +64,12 @@ async def show_stats(request: Request):
 
     results.sort(key=lambda x: x[1], reverse=True)
 
+    # 4명 딜량을 문자열로 만듦 (예: whaleandseal(123.45), ...)
+    og_description = ", ".join([f"{name}({dmg:.2f})" for name, dmg in results])
+    og_description = f"배그 딜량 순위: {og_description}"
+
     return templates.TemplateResponse("stats.html", {
         "request": request,
-        "results": results
+        "results": results,
+        "og_description": og_description
     })
