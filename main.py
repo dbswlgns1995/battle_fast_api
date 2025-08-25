@@ -8,7 +8,7 @@ templates = Jinja2Templates(directory="templates")
 
 API_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4NTRlMmFiMC1kNmYyLTAxM2QtZDhhOS0xZWRhMTNiOWEyZmYiLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNzQwNjMxMDY4LCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6InNlYXJjaGluZy1yZWNvIn0.s6rzKU3YAhO5CLoUqkHwKn1ldtni4mZy5oSNQIoxBRo"
 PLATFORM = "steam"
-PLAYER_NAMES = ["whaleandseal", "BestnameSE", "239_xxx", "HEELU_"]
+PLAYER_NAMES = ["whaleandseal", "BestnameSE", "XiangKuo_239_", "HEELU_"]
 
 def get_player_id(player_name):
     url = f"https://api.pubg.com/shards/{PLATFORM}/players?filter[playerNames]={player_name}"
