@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSK 배그 전적</title>
+<meta property="og:title" content="DSK 배그 전적" />
+<meta property="og:description" content="딜량·K/D·승률·생존·헤드샷까지, 우리끼리 현 시즌 전적 비교" />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#0c0e12; --panel:#151820; --panel2:#1c2029; --line:#262b36;
+  --text:#eef0f4; --sub:#9097a6; --dim:#5d6473;
+  --accent:#f2a900; --accent-soft:rgba(242,169,0,.14);
+  --p0:#f2a900; --p1:#3dc2ff; --p2:#ff5c8a; --p3:#6be38b;
+  --bad:#ff6b6b;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:
+    radial-gradient(1200px 500px at 50% -200px, rgba(242,169,0,.10), transparent 70%),
+    var(--bg);
+  color:var(--text);
+  font-family:"Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  min-height:100vh;
+}
+.wrap{max-width:980px;margin:0 auto;padding:28px 16px 64px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.brand small{display:block;color:var(--accent);font-weight:700;letter-spacing:.18em;font-size:12px;margin-bottom:6px}
+.brand h1{margin:0;font-family:"Black Han Sans",sans-serif;font-weight:400;font-size:38px;letter-spacing:.01em;line-height:1}
+.meta{color:var(--sub);font-size:13px;text-align:right}
+.meta button{
+  margin-top:6px;background:var(--panel2);color:var(--text);border:1px solid var(--line);
+  padding:8px 14px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer
+}
+.meta button:hover{border-color:var(--accent)}
+.meta button:disabled{opacity:.5;cursor:default}
+
+
+.status{padding:40px 0;text-align:center;color:var(--sub)}
+.status.error{color:var(--bad);white-space:pre-wrap}
+.spinner{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+section{margin-top:28px}
+h2{font-size:15px;color:var(--sub);font-weight:700;margin:0 0 12px;letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+h2::before{content:"";width:4px;height:14px;background:var(--accent);border-radius:2px}
+
+/* podium cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;position:relative;overflow:hidden
+}
+.card::after{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--c)}
+.card.first{border-color:rgba(242,169,0,.5);background:linear-gradient(180deg,var(--accent-soft),var(--panel) 60%)}
+.rank{font-family:"Black Han Sans",sans-serif;font-size:34px;line-height:1;color:var(--c)}
+.rank span{font-size:14px;color:var(--sub);font-family:"Noto Sans KR";font-weight:700;margin-left:2px}
+.name{font-weight:900;font-size:18px;margin:8px 0 2px;word-break:break-all}
+.games{color:var(--sub);font-size:12px}
+.score{display:flex;align-items:baseline;gap:6px;margin:12px 0 10px}
+.score b{font-size:26px;font-weight:900}
+.score em{font-style:normal;color:var(--sub);font-size:12px}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.mini div{background:var(--panel2);border-radius:10px;padding:8px 6px;text-align:center}
+.mini b{display:block;font-size:15px}
+.mini span{font-size:11px;color:var(--sub)}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:11px;font-weight:700;padding:4px 8px;border-radius:999px;background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+.tag.gold{background:var(--accent-soft);color:var(--accent);border-color:rgba(242,169,0,.35)}
+.card.empty{opacity:.55}
+
+/* radar */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.radar svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:6px;font-size:12px;color:var(--sub)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* awards */
+.awards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.award{background:var(--panel2);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center}
+.award .ico{font-size:22px;width:30px;text-align:center}
+.award .t{font-size:12px;color:var(--sub)}
+.award .w{font-weight:900;font-size:14px;word-break:break-all}
+.award .v{font-size:12px;color:var(--accent);font-weight:700}
+
+/* leaderboards */
+.boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.board h3{margin:0 0 2px;font-size:15px}
+.board p{margin:0 0 12px;font-size:11px;color:var(--dim)}
+.row{display:grid;grid-template-columns:116px 1fr 62px;align-items:center;gap:8px;margin:7px 0;font-size:13px}
+.row .who{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
+.row.top .who{color:var(--text);font-weight:700}
+.bar{height:10px;background:var(--panel2);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;background:var(--c);opacity:.85;transition:width .6s ease}
+.row .val{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+
+/* table */
+.tablewrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--panel)}
+thead th{color:var(--sub);font-weight:700;font-size:12px;background:var(--panel)}
+tbody tr:last-child td{border-bottom:none}
+td.best{color:var(--accent);font-weight:900}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--c)}
+
+/* day analysis */
+.day{border:1px solid rgba(242,169,0,.35);background:linear-gradient(180deg,rgba(242,169,0,.07),var(--panel) 220px);border-radius:20px;padding:18px}
+.day-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.day-head .lbl{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.12em}
+.day-head .date{font-family:"Black Han Sans",sans-serif;font-size:28px;line-height:1.1;margin-top:4px}
+.day-head .who{color:var(--sub);font-size:12px}
+.summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+.summary div{background:var(--panel2);border-radius:12px;padding:10px 8px;text-align:center}
+.summary b{display:block;font-size:20px;font-weight:900}
+.summary span{font-size:11px;color:var(--sub)}
+.dcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px}
+.dcard{background:var(--panel2);border-radius:14px;padding:12px 14px;border-left:3px solid var(--c)}
+.dcard .top{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.dcard .nm{font-weight:900;word-break:break-all}
+.mvp{font-size:11px;font-weight:900;background:var(--accent);color:#111;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.title{display:inline-block;font-size:12px;font-weight:900;padding:4px 9px;border-radius:999px;white-space:nowrap;background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+.title.t1{background:var(--accent);color:#111;border-color:var(--accent)}
+.title.t2{background:rgba(200,210,225,.14);color:#dfe5ee;border-color:rgba(200,210,225,.3)}
+.title.tlast{background:rgba(139,90,43,.28);color:#e8b67a;border-color:rgba(160,105,50,.55)}
+.rankline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.drank{font-family:"Black Han Sans",sans-serif;font-size:20px;color:var(--c)}
+.squadtag{display:inline-block;margin-left:8px;font-size:11px;font-weight:900;letter-spacing:0;padding:3px 9px;border-radius:999px;background:var(--accent);color:#111;vertical-align:1px}
+.gsize{display:inline-block;margin-top:3px;font-size:10px;font-weight:700;color:var(--accent);border:1px solid rgba(242,169,0,.4);border-radius:6px;padding:1px 5px}
+.dcard .big{font-size:22px;font-weight:900;margin:6px 0 2px}
+.dcard .big em{font-style:normal;font-size:11px;color:var(--sub);font-weight:500;margin-left:4px}
+.dcard .ln{font-size:12px;color:var(--sub);line-height:1.7}
+.dcard .ln b{color:var(--text)}
+.day .awards{grid-template-columns:repeat(3,1fr);margin-bottom:14px}
+.day .award{background:var(--panel2)}
+.tl h3{font-size:13px;color:var(--sub);margin:0 0 8px}
+.game{display:grid;grid-template-columns:52px 64px 1fr;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.game .tm{font-size:12px;color:var(--sub);font-variant-numeric:tabular-nums}
+.game .tm b{display:block;color:var(--text);font-size:13px}
+.place{font-family:"Black Han Sans",sans-serif;font-size:22px;text-align:center}
+.place.win{color:var(--accent)}
+.place small{display:block;font-family:"Noto Sans KR";font-size:10px;color:var(--sub)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:4px 8px;white-space:nowrap}
+.chip i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:1px}
+.chip.dead1{border-color:rgba(255,107,107,.45)}
+.note{color:var(--sub);font-size:13px;background:var(--panel);border:1px dashed var(--line);border-radius:14px;padding:14px;text-align:center}
+@media (max-width:720px){
+  .summary{grid-template-columns:repeat(3,1fr)}
+  .day .awards{grid-template-columns:1fr 1fr}
+}
+footer{margin-top:32px;color:var(--dim);font-size:11px;text-align:center;line-height:1.7}
+
+@media (max-width:720px){
+  .two{grid-template-columns:1fr}
+  .brand h1{font-size:30px}
+  .meta{text-align:left}
+}
+@media (max-width:420px){
+  .awards{grid-template-columns:1fr}
+  .row{grid-template-columns:104px 1fr 56px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <small>PUBG · STEAM · 스쿼드 TPP</small>
+      <h1>DSK 배그 전적</h1>
+    </div>
+    <div class="meta">
+      <div id="seasonLabel">시즌 정보 불러오는 중</div>
+      <div id="updated"></div>
+      <button id="reload" type="button">새로고침</button>
+    </div>
+  </header>
+
+  <div id="status" class="status"><div class="spinner"></div>전적 불러오는 중...</div>
+  <main id="app"></main>
+
+  <footer>
+    시즌 종합 순위·칭호·항목별 순위·상세 기록 = 등록한 4명 중 3명 이상이 같은 팀으로 한 스쿼드 TPP 판만 모아서 계산<br>
+    종합 점수 = 평균 딜량·K/D·승률·탑10 비율·헤드샷 비율·평균 생존시간을 4명 중 최고값 대비 점수로 바꿔 평균 낸 값 (100점 만점)<br>
+    팀 딜/킬 지분 = 같이 한 판에서 우리 팀 전체 딜(킬) 중 내 몫 · 좀비 지수 = 평균 생존(분) ÷ (평균 딜 ÷ 100)<br>
+    모든 기록은 현재 시즌만 (이전 시즌 제외)<br>
+    최근 같이 한 날 = 이번 시즌 매치 중 3명 이상이 같은 팀으로 한 스쿼드 TPP 매치가 있는 가장 최근 날 (새벽 6시 기준으로 날짜 구분)<br>
+    오늘의 MVP 점수 = 평균 딜 + 판당 킬 × 100 + 판당 부활 × 50<br>
+    K/D = 킬 ÷ (판수 − 치킨) · PUBG API는 1분에 10번까지만 호출 가능해서 2분 동안은 저장해둔 결과를 보여줘요
+  </footer>
+</div>
+
+<script>
+const API_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4NTRlMmFiMC1kNmYyLTAxM2QtZDhhOS0xZWRhMTNiOWEyZmYiLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNzQwNjMxMDY4LCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6InNlYXJjaGluZy1yZWNvIn0.s6rzKU3YAhO5CLoUqkHwKn1ldtni4mZy5oSNQIoxBRo";
+const PLATFORM = "steam";
+const PLAYER_NAMES = ["whaleandseal", "XiangKuo_239_", "doo8492", "HEELU_"];
+const COLORS = ["var(--p0)", "var(--p1)", "var(--p2)", "var(--p3)"];
+const RAW_COLORS = ["#f2a900", "#3dc2ff", "#ff5c8a", "#6be38b"];
+const CACHE_KEY = "pubg_stats_cache_v5";
+const CACHE_MS = 2 * 60 * 1000;
+
+const ALL_MODE_KEYS = ["solo", "solo-fpp", "duo", "duo-fpp", "squad", "squad-fpp"];
+const MAX_FIELDS = ["longestKill", "roundMostKills", "maxKillStreaks", "longestTimeSurvived", "mostSurvivalTime"];
+
+const HEADERS = {
+  "Authorization": `Bearer ${API_KEY}`,
+  "Accept": "application/vnd.api+json"
+};
+
+/* ---------- API ---------- */
+async function apiGet(url) {
+  const res = await fetch(url, { headers: HEADERS });
+  if (res.status === 429) throw new Error("호출 한도 초과 (1분에 10회). 1분 뒤 새로고침 해주세요.");
+  return res;
+}
+
+async function getCurrentSeason() {
+  const res = await apiGet(`https://api.pubg.com/shards/${PLATFORM}/seasons`);
+  if (!res.ok) throw new Error(`시즌 조회 실패 (${res.status})`);
+  const seasons = (await res.json()).data;
+  return seasons.find(s => s.attributes.isCurrentSeason).id;
+}
+
+async function getPlayerId(name) {
+  const res = await apiGet(`https://api.pubg.com/shards/${PLATFORM}/players?filter[playerNames]=${encodeURIComponent(name)}`);
+  if (res.status === 200) {
+    const p = (await res.json()).data[0];
+    return { id: p.id, matchIds: (p.relationships?.matches?.data || []).map(m => m.id) };
+  }
+  return null;
+}
+
+async function getPlayerStats(playerId, seasonId) {
+  const res = await apiGet(`https://api.pubg.com/shards/${PLATFORM}/players/${playerId}/seasons/${seasonId}`);
+  if (res.status === 200) {
+    const d = (await res.json()).data;
+    // 이번 시즌 스쿼드 TPP 매치 목록 (시즌 응답의 relationships.matchesSquad). 필드가 없으면 null → 필터 안 함
+    const rel = d.relationships?.matchesSquad?.data;
+    return { modes: d.attributes.gameModeStats, squadIds: Array.isArray(rel) ? rel.map(m => m.id) : null };
+  }
+  return null;
+}
+
+async function fetchAll() {
+  const seasonId = await getCurrentSeason();
+  const players = [];
+  for (const name of PLAYER_NAMES) {
+    const found = await getPlayerId(name);
+    const season = found ? await getPlayerStats(found.id, seasonId) : null;
+    const modes = season ? season.modes : null;
+    // 이번 시즌 스쿼드 TPP 매치만 남김 (순서는 원래 목록 그대로 유지)
+    let matchIds = found ? found.matchIds : [];
+    if (season && season.squadIds) {
+      const inSeason = new Set(season.squadIds);
+      matchIds = matchIds.filter(m => inSeason.has(m));
+      season.squadIds.forEach(m => { if (!matchIds.includes(m)) matchIds.push(m); });
+    } else if (found) {
+      console.warn("[DSK] 시즌 매치 목록(matchesSquad)이 없어 시즌 필터 없이 진행", name);
+    }
+    players.push({ name, id: found ? found.id : null, matchIds, found: !!found, modes });
+  }
+  let together = { games: [], failed: 0, checked: 0 };
+  try { together = await fetchTogetherGames(players); }
+  catch (e) { together = { games: [], failed: 0, checked: 0, error: e.message }; }
+  let day = null;
+  try { day = await fetchRecentDay(players); }
+  catch (e) { day = { error: e.message }; }
+  for (const p of players) delete p.matchIds;
+  return { seasonId, players, together, day, fetchedAt: Date.now() };
+}
+
+/* ---------- 순위 칭호 ---------- */
+// 꼴찌는 인원수와 상관없이 항상 똥
+function funnyTitle(i, total) {
+  if (total > 1 && i === total - 1) return { text: "💩 오늘의 똥", cls: "tlast" };
+  if (i === 0) return { text: "👑 오늘의 MVP", cls: "t1" };
+  if (i === 1) return { text: "🥈 든든한 2인자", cls: "t2" };
+  return { text: "🚌 버스 탑승객", cls: "" };
+}
+
+/* ---------- 최근 같이 한 날 ---------- */
+const MAP_NAMES = {
+  Baltic_Main: "에란겔", Erangel_Main: "에란겔", Desert_Main: "미라마", Savage_Main: "사녹",
+  DihorOtok_Main: "비켄디", Tiger_Main: "태이고", Kiki_Main: "데스턴", Neon_Main: "론도",
+  Chimera_Main: "파라모", Summerland_Main: "카라킨", Heaven_Main: "헤이븐", Range_Main: "훈련장",
+};
+const MAX_MATCH_FETCH = 60;
+
+// 새벽 6시 전 판은 전날로 침
+function dayKeyOf(iso) {
+  return new Date(new Date(iso).getTime() - 6 * 3600e3).toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
+}
+
+// PUBG 매치 응답 중 일부는 CDN에 캐시된 사본이 CORS 헤더 없이 내려와서 브라우저가 막음.
+// (쿼리 붙이기는 PUBG가 400으로 거절, corsproxy.io는 401로 거절 → 제외)
+// Accept: application/json 으로 요청하면 CORS 헤더가 정상으로 옴 (실측 확인) → 1순위
+// 1차: application/json → 2차: vnd.api+json → 3·4차: 무료 CORS 프록시 (매치 데이터는 키 없이 공개된 정보)
+const MATCH_ROUTES = [
+  { name: "직접",            url: u => u, accept: "application/json" },
+  { name: "Accept 변경",     url: u => u, accept: "application/vnd.api+json" },
+  { name: "allorigins 프록시", url: u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}` },
+  { name: "codetabs 프록시",  url: u => `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(u)}` },
+];
+
+async function fetchMatch(matchId, idSet, attempt = 0) {
+  const route = MATCH_ROUTES[attempt];
+  const raw = `https://api.pubg.com/shards/${PLATFORM}/matches/${matchId}`;
+  const res = await fetch(route.url(raw), {
+    headers: route.accept ? { "Accept": route.accept } : {},
+    cache: "no-store",
+  });
+  if (!res.ok) return null;
+  const j = await res.json();
+  const a = j.data.attributes;
+  const parts = {}, rosters = [];
+  for (const inc of j.included || []) {
+    if (inc.type === "participant") parts[inc.id] = inc.attributes.stats;
+    else if (inc.type === "roster") rosters.push(inc);
+  }
+  let best = null;
+  for (const r of rosters) {
+    const ps = r.relationships.participants.data.map(d => parts[d.id]).filter(Boolean);
+    const mine = ps.filter(st => idSet.has(st.playerId));
+    if (!best || mine.length > best.mine.length) best = { r, mine, ps };
+  }
+  const together = a.gameMode === "squad" && a.matchType !== "custom" && best && best.mine.length >= 3;
+  return {
+    id: matchId,
+    createdAt: a.createdAt,
+    dayKey: dayKeyOf(a.createdAt),
+    map: MAP_NAMES[a.mapName] || a.mapName,
+    together,
+    gameMode: a.gameMode,
+    matchType: a.matchType,
+    sameTeam: best ? best.mine.length : 0,
+    rank: together ? best.r.attributes.stats.rank : null,
+    teamCount: rosters.length,
+    teamKills: together ? best.ps.reduce((s, x) => s + (x.kills || 0), 0) : 0,
+    teamDamage: together ? best.ps.reduce((s, x) => s + (x.damageDealt || 0), 0) : 0,
+    members: together ? best.mine.map(st => ({
+      playerId: st.playerId, kills: st.kills || 0, damage: st.damageDealt || 0, dbno: st.DBNOs || 0,
+      assists: st.assists || 0, revives: st.revives || 0, hs: st.headshotKills || 0,
+      longest: st.longestKill || 0, survived: st.timeSurvived || 0, heals: (st.heals || 0) + (st.boosts || 0),
+      walk: st.walkDistance || 0, ride: st.rideDistance || 0, swim: st.swimDistance || 0,
+      roadKills: st.roadKills || 0, tk: st.teamKills || 0, vDestroy: st.vehicleDestroys || 0,
+      weapons: st.weaponsAcquired || 0, streak: st.killStreaks || 0,
+    })) : [],
+  };
+}
+
+// 같은 매치를 시즌 집계·최근 같이 한 날에서 두 번 받지 않도록 메모 (성공한 것만 저장)
+const MATCH_MEMO = new Map();
+
+async function fetchMatchRetry(matchId, idSet) {
+  if (MATCH_MEMO.has(matchId)) return MATCH_MEMO.get(matchId);
+  for (let t = 0; t < MATCH_ROUTES.length; t++) {
+    try {
+      const g = await fetchMatch(matchId, idSet, t);
+      if (g) {
+        if (t > 0) console.log(`[DSK] ${MATCH_ROUTES[t].name}(으)로 불러옴`, matchId);
+        MATCH_MEMO.set(matchId, g);
+        return g;
+      }
+    } catch (e) {}
+    await new Promise(r => setTimeout(r, 300));
+  }
+  return { id: matchId, failed: true };
+}
+
+async function fetchRecentDay(players) {
+  const found = players.filter(p => p.id);
+  if (found.length < 3) return null;
+  const idSet = new Set(found.map(p => p.id));
+  const idx = {};
+  found.forEach(p => p.matchIds.forEach((m, i) => { (idx[m] ||= {})[p.id] = i; }));
+  // 한 명 목록에서 빠지는 경우가 있어서 2명 이상 목록에 있으면 후보로 보고, 실제 같은 팀 3명 이상인지는 매치 상세로 확인
+  const cands = Object.keys(idx).filter(m => Object.keys(idx[m]).length >= 2);
+  // 대략 최신순 정렬 (각자 목록에서의 위치 평균)
+  const pos = m => { const v = Object.values(idx[m]); return v.reduce((a, b) => a + b, 0) / v.length; };
+  cands.sort((x, y) => pos(x) - pos(y));
+
+  let dayKey = null;
+  const games = [];
+  let failed = 0, checked = 0, olderStreak = 0;
+  const list = cands.slice(0, MAX_MATCH_FETCH);
+  outer:
+  for (let i = 0; i < list.length; i += 4) {
+    const batch = await Promise.all(list.slice(i, i + 4).map(m => fetchMatchRetry(m, idSet)));
+    for (const g of batch) {
+      checked++;
+      if (g.failed) { failed++; console.warn("[DSK] 매치 불러오기 실패", g.id); continue; }
+      if (!g.together) {
+        console.log("[DSK] 제외", g.id, g.createdAt, g.gameMode, g.matchType, "같은 팀 " + g.sameTeam + "명");
+        if (dayKey && g.dayKey < dayKey && ++olderStreak >= 8) break outer;
+        continue;
+      }
+      if (!dayKey || g.dayKey > dayKey) { dayKey = g.dayKey; games.length = 0; }
+      if (g.dayKey === dayKey) { games.push(g); olderStreak = 0; }
+      else if (g.dayKey < dayKey && ++olderStreak >= 8) break outer; // 순서가 살짝 어긋나도 놓치지 않게 8판 연속 이전 날이면 멈춤
+    }
+  }
+  if (!games.length) return failed ? { error: `매치 ${failed}개를 못 불러왔어요. 새로고침 해주세요.` } : null;
+  games.sort((x, y) => x.createdAt.localeCompare(y.createdAt));
+  return { dayKey, games, failed, checked };
+}
+
+/* ---------- 같이 한 판 전체 (시즌 종합·칭호·항목별 순위용) ---------- */
+const TOGETHER_BATCH = 8;
+
+async function fetchTogetherGames(players) {
+  const found = players.filter(p => p.id);
+  if (found.length < 3) return { games: [], failed: 0, checked: 0 };
+  const idSet = new Set(found.map(p => p.id));
+  const cnt = {};
+  found.forEach(p => p.matchIds.forEach(m => { cnt[m] = (cnt[m] || 0) + 1; }));
+  // fetchRecentDay와 같은 기준: 2명 이상 목록에 있으면 후보, 실제 같은 팀 3명 이상인지는 매치 상세로 확인
+  const cands = Object.keys(cnt).filter(m => cnt[m] >= 2);
+  const games = [];
+  let failed = 0;
+  for (let i = 0; i < cands.length; i += TOGETHER_BATCH) {
+    const batch = await Promise.all(cands.slice(i, i + TOGETHER_BATCH).map(m => fetchMatchRetry(m, idSet)));
+    for (const g of batch) {
+      if (g.failed) { failed++; continue; }
+      if (g.together) games.push(g);
+    }
+  }
+  games.sort((x, y) => x.createdAt.localeCompare(y.createdAt));
+  return { games, failed, checked: cands.length };
+}
+
+// 같이 한 판만 모아서 시즌 통계(gameModeStats)와 같은 필드명으로 만듦 → 기존 analyze() 그대로 사용
+function togetherStats(games, pid) {
+  const s = {
+    roundsPlayed: 0, wins: 0, top10s: 0, kills: 0, damageDealt: 0, headshotKills: 0, dBNOs: 0, assists: 0,
+    timeSurvived: 0, longestKill: 0, roundMostKills: 0, maxKillStreaks: 0, revives: 0, heals: 0, boosts: 0,
+    walkDistance: 0, rideDistance: 0, swimDistance: 0, teamKills: 0, roadKills: 0, vehicleDestroys: 0, weaponsAcquired: 0,
+    firstDeaths: 0, zeroKillGames: 0, dmg300Games: 0, teamDmgTotal: 0, teamKillTotal: 0,
+  };
+  for (const g of games) {
+    const m = g.members.find(x => x.playerId === pid);
+    if (!m) continue;
+    s.roundsPlayed++;
+    if (g.rank === 1) s.wins++;
+    if (g.rank <= 10) s.top10s++;
+    s.kills += m.kills; s.damageDealt += m.damage; s.headshotKills += m.hs; s.dBNOs += m.dbno;
+    s.assists += m.assists; s.timeSurvived += m.survived; s.revives += m.revives; s.heals += m.heals;
+    s.walkDistance += m.walk || 0; s.rideDistance += m.ride || 0; s.swimDistance += m.swim || 0;
+    s.teamKills += m.tk || 0; s.roadKills += m.roadKills || 0; s.vehicleDestroys += m.vDestroy || 0;
+    s.weaponsAcquired += m.weapons || 0;
+    s.longestKill = Math.max(s.longestKill, m.longest);
+    s.roundMostKills = Math.max(s.roundMostKills, m.kills);
+    s.maxKillStreaks = Math.max(s.maxKillStreaks, m.streak || 0);
+    if (m.kills === 0) s.zeroKillGames++;
+    if (m.damage >= 300) s.dmg300Games++;
+    s.teamDmgTotal += g.teamDamage || 0;
+    s.teamKillTotal += g.teamKills || 0;
+    // 먼저 눕기: analyzeDay와 같은 규칙 (전원 같은 시간이면 제외)
+    const minSurv = Math.min(...g.members.map(x => x.survived));
+    const allSame = g.members.every(x => x.survived === minSurv);
+    if (!allSame && m.survived === minSurv) s.firstDeaths++;
+  }
+  return s;
+}
+
+function analyzeTogether(s) {
+  const a = analyze(s);
+  if (!a) return null;
+  const n = a.rounds;
+  return Object.assign(a, {
+    maxKillStreaks: s.maxKillStreaks,
+    teamDmgShare: s.teamDmgTotal ? s.damageDealt / s.teamDmgTotal * 100 : 0,
+    teamKillShare: s.teamKillTotal ? s.kills / s.teamKillTotal * 100 : 0,
+    dmg300Rate: s.dmg300Games / n * 100,
+    firstDeathRate: s.firstDeaths / n * 100,
+    zeroKillRate: s.zeroKillGames / n * 100,
+    dmgPerKill: s.damageDealt / Math.max(1, s.kills),
+    zombie: (a.avgSurvival / 60) / (Math.max(1, a.avgDmg) / 100),
+  });
+}
+
+function analyzeDay(day, players) {
+  const nameOf = {}, colorOf = {};
+  players.forEach((p, i) => { if (p.id) { nameOf[p.id] = p.name; colorOf[p.id] = COLORS[i]; } });
+  const agg = {};
+  for (const g of day.games) {
+    const minSurv = Math.min(...g.members.map(m => m.survived));
+    const allSame = g.members.every(m => m.survived === minSurv);
+    for (const m of g.members) {
+      const a = agg[m.playerId] ||= { id: m.playerId, name: nameOf[m.playerId], color: colorOf[m.playerId],
+        games: 0, kills: 0, damage: 0, dbno: 0, assists: 0, revives: 0, hs: 0, longest: 0, survived: 0, heals: 0,
+        firstDeath: 0, bestRank: 999, wins: 0 };
+      a.games++; a.kills += m.kills; a.damage += m.damage; a.dbno += m.dbno; a.assists += m.assists;
+      a.revives += m.revives; a.hs += m.hs; a.survived += m.survived; a.heals += m.heals;
+      a.longest = Math.max(a.longest, m.longest);
+      a.bestRank = Math.min(a.bestRank, g.rank);
+      if (g.rank === 1) a.wins++;
+      if (!allSame && m.survived === minSurv) { a.firstDeath++; m.first = true; }
+    }
+  }
+  const people = Object.values(agg);
+  for (const a of people) {
+    a.avgDmg = a.damage / a.games;
+    a.mvpScore = a.avgDmg + a.kills / a.games * 100 + a.revives / a.games * 50;
+  }
+  people.sort((x, y) => y.mvpScore - x.mvpScore);
+  const ranks = day.games.map(g => g.rank);
+  return {
+    people, nameOf, colorOf,
+    games: day.games.length,
+    wins: ranks.filter(r => r === 1).length,
+    best: Math.min(...ranks),
+    avgRank: ranks.reduce((s, r) => s + r, 0) / ranks.length,
+    top10: ranks.filter(r => r <= 10).length,
+    teamKills: day.games.reduce((s, g) => s + g.teamKills, 0),
+  };
+}
+
+function squadLabel(day) {
+  const sizes = [...new Set(day.games.map(g => g.members.length))].sort();
+  return `<span class="squadtag">${sizes.join("·")}인 스쿼드</span>`;
+}
+
+function renderDay() {
+  const day = DATA.day;
+  if (!day) return `<section><h2>최근 같이 한 날</h2><div class="note">이번 시즌에 3명 이상 같이 한 스쿼드 TPP 매치가 없어요.</div></section>`;
+  if (day.error) return `<section><h2>최근 같이 한 날</h2><div class="note">매치 기록을 못 불러왔어요: ${esc(day.error)}</div></section>`;
+
+  const d = analyzeDay(day, DATA.players);
+  const [y, mo, dd] = day.dayKey.split("-").map(Number);
+  const wd = "일월화수목금토"[new Date(y, mo - 1, dd).getDay()];
+  const hm = iso => new Date(iso).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hour12: false });
+
+  const summary = `<div class="summary">
+    <div><b>${d.games}판</b><span>같이 한 판</span></div>
+    <div><b>${d.wins ? "🍗 " + d.wins : "0"}</b><span>치킨</span></div>
+    <div><b>#${d.best}</b><span>최고 순위</span></div>
+    <div><b>#${d.avgRank.toFixed(1)}</b><span>평균 순위</span></div>
+    <div><b>${d.teamKills}</b><span>팀 킬 합계</span></div>
+  </div>`;
+
+  const cards = d.people.map((a, i) => `
+    <div class="dcard" style="--c:${a.color}">
+      <div class="rankline"><span class="drank">${i + 1}위</span>${(t => `<span class="title ${t.cls}">${t.text}</span>`)(funnyTitle(i, d.people.length))}</div>
+      <div class="top" style="margin-top:6px"><span class="nm">${esc(a.name)}</span></div>
+      <div class="big">${fmt.n0(a.avgDmg)}<em>평균 딜 · ${a.games}판</em></div>
+      <div class="ln">킬 <b>${a.kills}</b> · 기절 <b>${a.dbno}</b> · 어시 <b>${a.assists}</b> · 부활 <b>${a.revives}</b></div>
+      <div class="ln">평균 생존 <b>${fmt.time(a.survived / a.games)}</b> · 먼저 눕기 <b>${a.firstDeath}회</b></div>
+    </div>`).join("");
+
+  const topBy = (key, f) => {
+    const w = [...d.people].sort((x, y) => y[key] - x[key])[0];
+    return w && w[key] > 0 ? { w, v: f(w[key]) } : null;
+  };
+  const awards = [
+    { ico: "💥", t: "딜 1등 (총합)", r: topBy("damage", v => fmt.n0(v)) },
+    { ico: "🔪", t: "킬 1등", r: topBy("kills", v => v + "킬") },
+    { ico: "😵", t: "기절 제조기", r: topBy("dbno", v => v + "회") },
+    { ico: "🩹", t: "오늘의 의무병", r: topBy("revives", v => v + "회 부활") },
+    { ico: "🎯", t: "헤드샷", r: topBy("hs", v => v + "킬") },
+    { ico: "🪦", t: "먼저 눕기 장인", r: topBy("firstDeath", v => v + "회") },
+  ].map(a => `<div class="award"><div class="ico">${a.ico}</div><div>
+      <div class="t">${a.t}</div><div class="w">${a.r ? esc(a.r.w.name) : "없음"}</div>
+      ${a.r ? `<div class="v">${a.r.v}</div>` : ""}</div></div>`).join("");
+
+  const timeline = [...day.games].reverse().map(g => `
+    <div class="game">
+      <div class="tm"><b>${hm(g.createdAt)}</b>${esc(g.map)}</div>
+      <div class="place ${g.rank === 1 ? "win" : ""}">${g.rank === 1 ? "🍗" : "#" + g.rank}<small>${g.teamCount}팀 중</small><span class="gsize">${g.members.length}인</span></div>
+      <div class="chips">${[...g.members].sort((x, y) => y.damage - x.damage).map(m => `
+        <span class="chip ${m.first ? "dead1" : ""}" style="--c:${d.colorOf[m.playerId]}"><i></i>${esc(d.nameOf[m.playerId])} ${m.kills}킬 · ${fmt.n0(m.damage)}${m.first ? " 🪦" : ""}</span>`).join("")}
+      </div>
+    </div>`).join("");
+
+  return `<section class="day">
+    <div class="day-head">
+      <div><div class="lbl">최근 같이 한 날${squadLabel(day)}</div><div class="date">${mo}월 ${dd}일 (${wd})</div></div>
+      <div class="who">${d.people.map(a => esc(a.name)).join(" · ")}</div>
+    </div>
+    ${summary}
+    <div class="dcards">${cards}</div>
+    <div class="awards">${awards}</div>
+    <div class="tl"><h3>판별 기록 (최신순 · 🪦 = 팀에서 제일 먼저 죽음)${day.failed ? ` <span style="color:var(--bad)">· ${day.failed}판 불러오기 실패, 새로고침 해주세요</span>` : ""}</h3>${timeline}</div>
+  </section>`;
+}
+
+function readCache() {
+  try {
+    const c = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+    if (c && Date.now() - c.fetchedAt < CACHE_MS && JSON.stringify(c.names) === JSON.stringify(PLAYER_NAMES)) return c.data;
+  } catch (e) {}
+  return null;
+}
+function writeCache(data) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ fetchedAt: data.fetchedAt, names: PLAYER_NAMES, data })); } catch (e) {}
+}
+
+/* ---------- 분석 ---------- */
+function pickModeStats(modes, modeKey) {
+  if (!modes) return null;
+  if (modeKey !== "all") return modes[modeKey] || null;
+  const sum = {};
+  for (const k of ALL_MODE_KEYS) {
+    const s = modes[k];
+    if (!s) continue;
+    for (const [f, v] of Object.entries(s)) {
+      if (typeof v !== "number") continue;
+      if (MAX_FIELDS.includes(f)) sum[f] = Math.max(sum[f] || 0, v);
+      else sum[f] = (sum[f] || 0) + v;
+    }
+  }
+  return sum;
+}
+
+function analyze(s) {
+  const n = s?.roundsPlayed || 0;
+  if (!n) return null;
+  const g = (k) => s[k] || 0;
+  const deaths = Math.max(1, n - g("wins"));
+  return {
+    rounds: n,
+    wins: g("wins"),
+    top10s: g("top10s"),
+    kills: g("kills"),
+    avgDmg: g("damageDealt") / n,
+    kd: g("kills") / deaths,
+    avgKills: g("kills") / n,
+    winRate: g("wins") / n * 100,
+    top10Rate: g("top10s") / n * 100,
+    hsRate: g("kills") ? g("headshotKills") / g("kills") * 100 : 0,
+    avgDbno: g("dBNOs") / n,
+    avgAssists: g("assists") / n,
+    avgSurvival: g("timeSurvived") / n,
+    longestKill: g("longestKill"),
+    roundMostKills: g("roundMostKills"),
+    revives: g("revives"),
+    revivesPer: g("revives") / n,
+    healsPer: (g("heals") + g("boosts")) / n,
+    walkPer: g("walkDistance") / n,
+    ridePer: g("rideDistance") / n,
+    swim: g("swimDistance"),
+    teamKills: g("teamKills"),
+    roadKills: g("roadKills"),
+    vehicleDestroys: g("vehicleDestroys"),
+    weaponsPer: g("weaponsAcquired") / n,
+  };
+}
+
+const fmt = {
+  n0: v => Math.round(v).toLocaleString("ko-KR"),
+  n1: v => v.toFixed(1),
+  n2: v => v.toFixed(2),
+  pct: v => v.toFixed(1) + "%",
+  m: v => Math.round(v).toLocaleString("ko-KR") + "m",
+  km: v => (v / 1000).toFixed(2) + "km",
+  time: v => { const m = Math.floor(v / 60), s = Math.round(v % 60); return `${m}:${String(s).padStart(2, "0")}`; },
+};
+
+const SCORE_AXES = [
+  { key: "avgDmg",      label: "딜량" },
+  { key: "kd",          label: "K/D" },
+  { key: "winRate",     label: "승률" },
+  { key: "top10Rate",   label: "탑10" },
+  { key: "hsRate",      label: "헤드샷" },
+  { key: "avgSurvival", label: "생존" },
+];
+
+const BOARDS = [
+  { key: "avgDmg",      title: "평균 딜량",        desc: "한 판당 넣은 데미지",        f: fmt.n1 },
+  { key: "kd",          title: "K/D",             desc: "킬 ÷ (판수 − 치킨)",          f: fmt.n2 },
+  { key: "avgKills",    title: "평균 킬",          desc: "한 판당 킬",                  f: fmt.n2 },
+  { key: "winRate",     title: "치킨 확률",        desc: "1등 한 비율",                  f: fmt.pct },
+  { key: "top10Rate",   title: "탑10 비율",        desc: "10등 안에 든 비율",            f: fmt.pct },
+  { key: "hsRate",      title: "헤드샷 비율",      desc: "킬 중 헤드샷 마무리 비율",     f: fmt.pct },
+  { key: "avgDbno",     title: "평균 기절시킨 수",  desc: "한 판당 적 기절(DBNO)",       f: fmt.n2 },
+  { key: "avgAssists",  title: "평균 어시스트",    desc: "한 판당 어시스트",             f: fmt.n2 },
+  { key: "avgSurvival", title: "평균 생존 시간",   desc: "한 판당 버틴 시간 (분:초)",    f: fmt.time },
+  { key: "revivesPer",  title: "판당 부활",        desc: "팀원 살린 횟수",               f: fmt.n2 },
+  { key: "healsPer",    title: "판당 회복·부스트", desc: "구급상자·붕대·음료 사용",      f: fmt.n1 },
+  { key: "walkPer",     title: "판당 걸은 거리",   desc: "도보 이동 거리",               f: fmt.km },
+  { key: "teamDmgShare",   title: "팀 딜 지분",       desc: "우리 팀 전체 딜 중 내 몫",       f: fmt.pct },
+  { key: "teamKillShare",  title: "팀 킬 지분",       desc: "우리 팀 전체 킬 중 내 몫",       f: fmt.pct },
+  { key: "dmg300Rate",     title: "300딜 이상 판 비율", desc: "한 판에 딜 300 넘긴 비율",     f: fmt.pct },
+  { key: "roundMostKills", title: "한 판 최다 킬",    desc: "같이 한 판 중 최고 기록",        f: v => v + "킬" },
+  { key: "maxKillStreaks", title: "최다 연속 킬",     desc: "한 판 안에서 연속으로 잡은 킬",  f: v => v + "킬" },
+  { key: "longestKill",    title: "최장거리 킬",      desc: "가장 먼 거리에서 잡은 킬",       f: fmt.m },
+  { key: "ridePer",        title: "판당 운전 거리",   desc: "차량 이동 거리",                f: fmt.km },
+  { key: "weaponsPer",     title: "판당 무기 줍기",   desc: "주운 무기 수",                  f: fmt.n1 },
+];
+
+const STYLE_TAGS = {
+  avgDmg: "💥 딜러", kd: "🔪 킬러", winRate: "🍗 치킨 수집가", top10Rate: "🛡️ 존버형",
+  hsRate: "🎯 헤드 장인", avgSurvival: "⏳ 생존왕", revivesPer: "🩹 의무병",
+  longestKill: "🔭 스나이퍼", avgAssists: "🤝 도우미", ridePer: "🚗 운전기사",
+  teamDmgShare: "🏋️ 하드캐리", walkPer: "🏃 마라토너", weaponsPer: "🛒 쇼핑왕", healsPer: "💊 약쟁이",
+};
+
+function buildView(data, modeKey) {
+  const rows = data.players.map((p, i) => ({
+    ...p, idx: i, color: COLORS[i], raw: RAW_COLORS[i],
+    a: p.id ? analyzeTogether(togetherStats(data.together?.games || [], p.id)) : null,
+  }));
+  const active = rows.filter(r => r.a);
+
+  // 최고값 대비 점수
+  const maxOf = {};
+  const allKeys = new Set([...SCORE_AXES.map(x => x.key), ...BOARDS.map(b => b.key), ...Object.keys(STYLE_TAGS),
+    "longestKill", "roundMostKills", "teamKills", "roadKills", "vehicleDestroys", "swim", "rounds"]);
+  for (const k of allKeys) maxOf[k] = Math.max(0, ...active.map(r => r.a[k]));
+  for (const r of active) {
+    r.norm = {};
+    for (const ax of SCORE_AXES) r.norm[ax.key] = maxOf[ax.key] > 0 ? r.a[ax.key] / maxOf[ax.key] * 100 : 0;
+    r.score = SCORE_AXES.reduce((s, ax) => s + r.norm[ax.key], 0) / SCORE_AXES.length;
+    r.tags = Object.keys(STYLE_TAGS).filter(k => active.length > 1 && maxOf[k] > 0 && r.a[k] === maxOf[k]).map(k => STYLE_TAGS[k]);
+  }
+  active.sort((a, b) => b.score - a.score);
+  const inactive = rows.filter(r => !r.a);
+  return { rows, active, inactive, maxOf };
+}
+
+/* ---------- 렌더 ---------- */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function renderCards(v) {
+  const cards = v.active.map((r, i) => `
+    <div class="card ${i === 0 ? "first" : ""}" style="--c:${r.color}">
+      <div class="rank">${i + 1}<span>위</span></div>
+      <div class="name">${esc(r.name)}</div>
+      <div class="games">${r.a.rounds}판 · 치킨 ${r.a.wins} · 탑10 ${r.a.top10s}</div>
+      <div class="score"><b>${r.score.toFixed(1)}</b><em>종합 점수</em></div>
+      <div class="mini">
+        <div><b>${fmt.n0(r.a.avgDmg)}</b><span>평균 딜</span></div>
+        <div><b>${fmt.n2(r.a.kd)}</b><span>K/D</span></div>
+        <div><b>${fmt.pct(r.a.winRate)}</b><span>승률</span></div>
+      </div>
+      <div class="tags">${r.tags.length ? r.tags.map(t => `<span class="tag gold">${t}</span>`).join("") : `<span class="tag">💪 분발 필요</span>`}</div>
+    </div>`).join("");
+  const empties = v.inactive.map(r => `
+    <div class="card empty" style="--c:${r.color}">
+      <div class="rank">-</div>
+      <div class="name">${esc(r.name)}</div>
+      <div class="games">${r.found ? "같이 한 스쿼드 TPP 기록 없음" : "플레이어를 못 찾았어요"}</div>
+    </div>`).join("");
+  const t = DATA.together || { games: [] };
+  const info = ` <span style="font-weight:500;color:var(--dim)">· 3명 이상 같이 한 스쿼드 TPP ${t.games.length}판 기준${t.failed ? ` <span style="color:var(--bad)">· ${t.failed}판 불러오기 실패, 새로고침 해주세요</span>` : ""}</span>`;
+  return `<section><h2>시즌 종합 순위${info}</h2><div class="cards">${cards}${empties}</div></section>`;
+}
+
+function renderRadar(v) {
+  const size = 300, cx = 150, cy = 150, R = 105, N = SCORE_AXES.length;
+  const pt = (i, r) => {
+    const ang = -Math.PI / 2 + i * 2 * Math.PI / N;
+    return [cx + Math.cos(ang) * r, cy + Math.sin(ang) * r];
+  };
+  let grid = "";
+  for (const lv of [0.25, 0.5, 0.75, 1]) {
+    grid += `<polygon points="${SCORE_AXES.map((_, i) => pt(i, R * lv).join(",")).join(" ")}" fill="none" stroke="#262b36" stroke-width="1"/>`;
+  }
+  SCORE_AXES.forEach((ax, i) => {
+    const [x, y] = pt(i, R);
+    const [lx, ly] = pt(i, R + 20);
+    grid += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#262b36"/>`;
+    grid += `<text x="${lx}" y="${ly}" fill="#9097a6" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle">${ax.label}</text>`;
+  });
+  const polys = [...v.active].reverse().map(r => {
+    const pts = SCORE_AXES.map((ax, i) => pt(i, R * Math.max(0.03, r.norm[ax.key] / 100)).join(",")).join(" ");
+    return `<polygon points="${pts}" fill="${r.raw}" fill-opacity=".14" stroke="${r.raw}" stroke-width="2" stroke-linejoin="round"/>`;
+  }).join("");
+  const legend = v.active.map(r => `<span><i style="background:${r.raw}"></i>${esc(r.name)}</span>`).join("");
+  return `<div class="panel radar">
+    <h2>플레이 스타일 비교</h2>
+    <svg viewBox="0 0 ${size} ${size}" role="img" aria-label="6개 지표 레이더 차트">${grid}${polys}</svg>
+    <div class="legend">${legend}</div>
+  </div>`;
+}
+
+function renderAwards(v) {
+  const top = (key, cond = x => x > 0) => {
+    const best = [...v.active].sort((a, b) => b.a[key] - a.a[key])[0];
+    return best && cond(best.a[key]) ? best : null;
+  };
+  const list = [
+    { ico: "🔭", t: "최장거리 킬",       key: "longestKill",     f: fmt.m },
+    { ico: "🔥", t: "한 판 최다 킬",     key: "roundMostKills",  f: v => v + "킬" },
+    { ico: "🩹", t: "부활 장인 (누적)",  key: "revives",         f: v => v + "회" },
+    { ico: "🚗", t: "판당 운전 거리",    key: "ridePer",         f: fmt.km },
+    { ico: "💣", t: "차량 폭파",         key: "vehicleDestroys", f: v => v + "대" },
+    { ico: "🛞", t: "로드킬",            key: "roadKills",       f: v => v + "킬" },
+    { ico: "🏊", t: "누적 수영 거리",    key: "swim",            f: fmt.m },
+    { ico: "😇", t: "팀킬 (반성하세요)", key: "teamKills",       f: v => v + "회" },
+    { ico: "🪦", t: "먼저 눕기 장인",    key: "firstDeathRate",  f: v => "팀에서 제일 먼저 죽은 판 " + fmt.pct(v) },
+    { ico: "🥚", t: "빈손 귀가 (0킬 판)", key: "zeroKillRate",   f: fmt.pct },
+    { ico: "🧟", t: "좀비 (오래 살고 딜 적음)", key: "zombie",   f: v => "좀비 지수 " + fmt.n2(v) },
+    { ico: "🥲", t: "딜만 넣고 킬 뺏김", key: "dmgPerKill",      f: v => "킬당 딜 " + fmt.n0(v) },
+    { ico: "🤝", t: "숟가락 얹기 (어시왕)", key: "avgAssists",   f: v => "판당 " + fmt.n2(v) },
+    { ico: "💊", t: "약쟁이",            key: "healsPer",        f: v => "판당 " + fmt.n1(v) + "개" },
+    { ico: "🛒", t: "쇼핑왕",            key: "weaponsPer",      f: v => "판당 무기 " + fmt.n1(v) + "개" },
+    { ico: "🏃", t: "마라토너",          key: "walkPer",         f: v => "판당 " + fmt.km(v) },
+  ];
+  const items = list.map(a => {
+    const w = top(a.key);
+    return `<div class="award"><div class="ico">${a.ico}</div><div>
+      <div class="t">${a.t}</div>
+      <div class="w">${w ? esc(w.name) : "없음"}</div>
+      ${w ? `<div class="v">${a.f(w.a[a.key])}</div>` : ""}
+    </div></div>`;
+  }).join("");
+  return `<div class="panel"><h2>이번 시즌 칭호</h2><div class="awards">${items}</div></div>`;
+}
+
+function renderBoards(v) {
+  const boards = BOARDS.map(b => {
+    const sorted = [...v.active].sort((x, y) => y.a[b.key] - x.a[b.key]);
+    const max = v.maxOf[b.key] || 1;
+    const rows = sorted.map((r, i) => `
+      <div class="row ${i === 0 && r.a[b.key] > 0 ? "top" : ""}" style="--c:${r.color}">
+        <div class="who">${i === 0 && r.a[b.key] > 0 ? "👑 " : ""}${esc(r.name)}</div>
+        <div class="bar"><i style="width:${Math.max(2, r.a[b.key] / max * 100)}%"></i></div>
+        <div class="val">${b.f(r.a[b.key])}</div>
+      </div>`).join("");
+    return `<div class="panel board"><h3>${b.title}</h3><p>${b.desc}</p>${rows}</div>`;
+  }).join("");
+  return `<section><h2>항목별 순위</h2><div class="boards">${boards}</div></section>`;
+}
+
+function renderTable(v) {
+  const cols = [
+    ["판수", "rounds", fmt.n0], ["치킨", "wins", fmt.n0], ["킬", "kills", fmt.n0],
+    ["평균 딜", "avgDmg", fmt.n1], ["K/D", "kd", fmt.n2], ["승률", "winRate", fmt.pct],
+    ["탑10", "top10Rate", fmt.pct], ["헤드샷", "hsRate", fmt.pct], ["기절", "avgDbno", fmt.n2],
+    ["생존", "avgSurvival", fmt.time], ["최장킬", "longestKill", fmt.m], ["판당 무기 줍기", "weaponsPer", fmt.n1],
+    ["팀 딜 지분", "teamDmgShare", fmt.pct], ["팀 킬 지분", "teamKillShare", fmt.pct],
+  ];
+  const head = `<tr><th>플레이어</th>${cols.map(c => `<th>${c[0]}</th>`).join("")}</tr>`;
+  const body = v.active.map(r => `<tr><td><span class="dot" style="--c:${r.color}"></span>${esc(r.name)}</td>${
+    cols.map(c => `<td class="${v.active.length > 1 && r.a[c[1]] === v.maxOf[c[1]] && r.a[c[1]] > 0 ? "best" : ""}">${c[2](r.a[c[1]])}</td>`).join("")
+  }</tr>`).join("");
+  return `<section><h2>상세 기록</h2><div class="tablewrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div></section>`;
+}
+
+let DATA = null;
+const MODE = "squad";
+
+function render() {
+  if (!DATA) return;
+  const v = buildView(DATA, MODE);
+  const app = document.getElementById("app");
+  if (!v.active.length) {
+    app.innerHTML = renderDay() + `<div class="status">3명 이상 같이 한 스쿼드 TPP 기록이 아직 없어요.</div>`;
+    return;
+  }
+  app.innerHTML =
+    renderDay() +
+    renderCards(v) +
+    `<section class="two">${renderRadar(v)}${renderAwards(v)}</section>` +
+    renderBoards(v) +
+    renderTable(v);
+}
+
+function setMeta() {
+  const m = DATA.seasonId.match(/(\d+)$/);
+  document.getElementById("seasonLabel").textContent = m ? `현재 시즌 ${m[1]}` : DATA.seasonId;
+  const d = new Date(DATA.fetchedAt);
+  document.getElementById("updated").textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")} 기준`;
+}
+
+async function load(force) {
+  const statusEl = document.getElementById("status");
+  const btn = document.getElementById("reload");
+  btn.disabled = true;
+  const cached = force ? null : readCache();
+  if (cached) {
+    DATA = cached;
+  } else {
+    statusEl.className = "status";
+    statusEl.innerHTML = `<div class="spinner"></div>전적 불러오는 중...`;
+    statusEl.style.display = "";
+    try {
+      DATA = await fetchAll();
+      if (!DATA.day?.failed && !DATA.day?.error && !DATA.together?.failed) writeCache(DATA);
+    } catch (e) {
+      statusEl.className = "status error";
+      statusEl.textContent = "불러오기 실패: " + e.message;
+      btn.disabled = false;
+      return;
+    }
+  }
+  statusEl.style.display = "none";
+  setMeta();
+  render();
+  btn.disabled = false;
+}
+
+document.getElementById("reload").addEventListener("click", () => load(true));
+load(false);
+</script>
+</body>
+</html>
